@@ -3,7 +3,7 @@
 
 # Field
 
-Field mixin for Vaadin 10 components.
+Field mixin for Vaadin 10+ components.
 
 ## Development instructions
 
