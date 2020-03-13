@@ -25,6 +25,10 @@ public class DemoView extends Div {
                 LocalDate.now());
         addDemoField("Composite date picker", new CompositeDatePicker(),
                 LocalDate.now());
+        addDemoField("Money field 1", new MoneyField1(), new Money(42));
+        addDemoField("Money field 2", new MoneyField2(), new Money(42));
+        addDemoField("Money field 3", new ConvertedField<>(new NumberField(), Money::getAmount, Money::new),
+                new Money(42));
     }
 
     private <T> void addDemoField(String name, Field<?, T> field,

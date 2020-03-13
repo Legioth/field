@@ -4,6 +4,7 @@ import org.github.legioth.field.SinglePropertyValueMapper.PropertyAccessor;
 
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.dom.Element;
@@ -243,6 +244,20 @@ public interface Field<C extends Component & Field<C, T>, T>
             SerializableSupplier<T> valueGenerator) {
         return new CompositeValueMapper<>(component, defaultValue,
                 valueGenerator);
+    }
+
+    static <T, U, C extends Composite<? extends HasValue<?, U>> & Field<C, T>> void initConverter(C component,
+            SerializableFunction<T, U> ownToComposite, SerializableFunction<U, T> compositeToOwn) {
+        HasValue<?, U> content = component.getContent();
+        U initialContentValue = content.getValue();
+        SerializableFunction<T, U> ownToCompositeOrNull = value -> value == null ? null : ownToComposite.apply(value);
+        SerializableFunction<U, T> compositeToOwnOrNull = value -> value == null ? null : compositeToOwn.apply(value);
+
+        T initialValue = compositeToOwnOrNull.apply(initialContentValue);
+        ValueMapper<T> mapper = Field.init(component, initialValue,
+                value -> content.setValue(ownToCompositeOrNull.apply(value)));
+        content.addValueChangeListener(
+                event -> mapper.setModelValue(compositeToOwnOrNull.apply(event.getValue()), event.isFromClient()));
     }
 
 }
